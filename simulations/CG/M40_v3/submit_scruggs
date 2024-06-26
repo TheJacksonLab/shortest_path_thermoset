@@ -1,0 +1,16 @@
+#!/bin/csh
+#$ -N deform
+#$ -cwd
+##$ -o job.out
+##$ -e job.err
+#$ -pe smp 12
+#$ -q all.q
+
+module load anaconda/3-2022.05
+#module load gcc/9.3.0 mpi/openmpi-x86_64
+module load gcc/10.3 openmpi/4.1.1
+source activate zy
+
+#export OMP_NUM_THREADS=24
+#mpirun ~/lammps-23Jun2022/build/lmp -in in.react500 
+python run.py

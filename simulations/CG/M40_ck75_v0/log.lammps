@@ -1,0 +1,161 @@
+LAMMPS (23 Jun 2022)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:98)
+  using 1 OpenMP thread(s) per MPI task
+# Kremer-Grest polymer model in LAMMPS
+
+units lj
+atom_style full
+dimension 3
+boundary p p p
+
+pair_style lj/cut 2.5
+#bond_style fene
+bond_style harmonic
+#angle_style harmonic
+
+read_data tmp.dat
+Reading data file ...
+  orthogonal box = (96.819411 96.819411 96.819411) to (103.18059 103.18059 103.18059)
+  1 by 2 by 2 MPI processor grid
+  reading atoms ...
+  200 atoms
+  scanning bonds ...
+  4 = max bonds/atom
+  reading bonds ...
+  194 bonds
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        0        0       
+  special bond factors coul:  0        0        0       
+     4 = max # of 1-2 neighbors
+     4 = max # of 1-3 neighbors
+    10 = max # of 1-4 neighbors
+    12 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+  read_data CPU = 0.009 seconds
+pair_coeff * * 1.0 1.0 2.5
+bond_coeff * 100.0 1.2
+#bond_coeff 1 30.0 1.5 1.0 1.0
+#angle_coeff 1 16 180
+
+#special_bonds fene
+special_bonds lj 0 1 1
+Finding 1-2 1-3 1-4 neighbors ...
+  special bond factors lj:    0        1        1       
+  special bond factors coul:  0        0        0       
+     4 = max # of 1-2 neighbors
+     4 = max # of 1-3 neighbors
+    10 = max # of 1-4 neighbors
+    12 = max # of special neighbors
+  special bonds CPU = 0.000 seconds
+
+timestep 0.002
+
+# Neighbor list
+neighbor 3.0 bin
+neigh_modify delay 0 every 1 check yes
+
+thermo_style    custom step temp density pe enthalpy press pxx pyy pzz pxy pxz pyz lx ly lz xy yz xz density
+thermo          1000
+
+#dump            1 all custom 10000 dump_relax.data id mol type x y z
+#dump_modify     1 sort id
+
+# Initializiation
+velocity all create 1.5 87287
+
+#NVT melt run
+#fix             1 all nvt temp 2.5 2.5 0.5
+fix             1 all npt temp 1.5 1.5 0.5 iso 1 1 5
+run             100
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+Neighbor list info ...
+  update every 1 steps, delay 0 steps, check yes
+  max neighbors/atom: 2000, page size: 100000
+  master list distance cutoff = 5.5
+  ghost atom cutoff = 5.5
+  binsize = 2.75, bins = 3 3 3
+  1 neighbor lists, perpetual/occasional/extra = 1 0 0
+  (1) pair lj/cut, perpetual
+      attributes: half, newton on
+      pair build: half/bin/newton
+      stencil: half/bin/3d
+      bin: standard
+WARNING: Inconsistent image flags (src/domain.cpp:819)
+Per MPI rank memory allocation (min/avg/max) = 7.332 | 7.333 | 7.333 Mbytes
+   Step          Temp         Density         PotEng        Enthalpy        Press           Pxx            Pyy            Pzz            Pxy            Pxz            Pyz             Lx             Ly             Lz             Xy             Yz             Xz          Density    
+         0   1.5            0.85469242    -4.0197445      0.81270732     2.0152885      2.2520788      1.5456634      2.2481232      0.050783978    0.25170919    -0.26720858     6.3611789      6.3611789      6.3611789      0              0              0              0.85469242   
+       100   1.2145421      0.85357045    -3.5531072      0.93979087     2.0797585      2.32942        1.4595272      2.4503284     -0.0046709305  -0.24268625    -0.020519686    6.3639648      6.3639648      6.3639648      0              0              0              0.85357045   
+Loop time of 0.0180146 on 4 procs for 100 steps with 200 atoms
+
+Performance: 959219.701 tau/day, 5551.040 timesteps/s
+93.6% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.0053593  | 0.0061576  | 0.007356   |   1.0 | 34.18
+Bond    | 8.255e-05  | 0.0001157  | 0.00014131 |   0.0 |  0.64
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0084575  | 0.0096716  | 0.010485   |   0.8 | 53.69
+Output  | 2.0442e-05 | 2.2645e-05 | 2.9076e-05 |   0.0 |  0.13
+Modify  | 0.00088923 | 0.00092244 | 0.00095492 |   0.0 |  5.12
+Other   |            | 0.001125   |            |       |  6.24
+
+Nlocal:             50 ave          55 max          43 min
+Histogram: 1 0 0 0 0 1 0 0 1 1
+Nghost:        2708.75 ave        2731 max        2691 min
+Histogram: 2 0 0 0 0 0 0 1 0 1
+Neighs:        13477.5 ave       14778 max       11763 min
+Histogram: 1 0 0 0 1 0 0 0 1 1
+
+Total # of neighbors = 53910
+Ave neighs/atom = 269.55
+Ave special neighs/atom = 7.53
+Neighbor list builds = 0
+Dangerous builds = 0
+unfix           1
+
+fix             1 all npt temp 0.01 0.01 0.5 iso 1 1 5
+run             100
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+WARNING: Inconsistent image flags (src/domain.cpp:819)
+Per MPI rank memory allocation (min/avg/max) = 7.332 | 7.333 | 7.333 Mbytes
+   Step          Temp         Density         PotEng        Enthalpy        Press           Pxx            Pyy            Pzz            Pxy            Pxz            Pyz             Lx             Ly             Lz             Xy             Yz             Xz          Density    
+       100   1.2145421      0.85357045    -3.5531072      0.93979087     2.0797585      2.32942        1.4595272      2.4503284     -0.0046709305  -0.24268625    -0.020519686    6.3639648      6.3639648      6.3639648      0              0              0              0.85357045   
+       200   0.39117297     0.90446052    -4.3032699     -1.1492079      2.113343       2.3739193      1.8051224      2.1609873      0.053853992    0.48773618     0.057328059    6.242296       6.242296       6.242296       0              0              0              0.90446052   
+Loop time of 0.0162984 on 4 procs for 100 steps with 200 atoms
+
+Performance: 1060226.543 tau/day, 6135.570 timesteps/s
+84.0% CPU use with 4 MPI tasks x 1 OpenMP threads
+
+MPI task timing breakdown:
+Section |  min time  |  avg time  |  max time  |%varavg| %total
+---------------------------------------------------------------
+Pair    | 0.0054876  | 0.0058055  | 0.0062205  |   0.4 | 35.62
+Bond    | 9.2962e-05 | 0.00011201 | 0.00012309 |   0.0 |  0.69
+Neigh   | 0          | 0          | 0          |   0.0 |  0.00
+Comm    | 0.0079928  | 0.0084218  | 0.0087421  |   0.3 | 51.67
+Output  | 1.9526e-05 | 2.1475e-05 | 2.6979e-05 |   0.0 |  0.13
+Modify  | 0.00085456 | 0.00086188 | 0.00087414 |   0.0 |  5.29
+Other   |            | 0.001076   |            |       |  6.60
+
+Nlocal:             50 ave          53 max          48 min
+Histogram: 1 0 1 0 1 0 0 0 0 1
+Nghost:        2663.25 ave        2687 max        2639 min
+Histogram: 1 0 0 1 0 0 1 0 0 1
+Neighs:        13457.2 ave       14231 max       12911 min
+Histogram: 1 0 1 1 0 0 0 0 0 1
+
+Total # of neighbors = 53829
+Ave neighs/atom = 269.145
+Ave special neighs/atom = 7.53
+Neighbor list builds = 0
+Dangerous builds = 0
+unfix           1
+
+#write_restart   sout.rest
+write_data      anneal.dat
+System init for write_data ...
+Generated 0 of 1 mixed pair_coeff terms from geometric mixing rule
+WARNING: Not all mixed pair coeffs generated from mixing. Use write_data with 'pair ij' option to store all pair coeffs. (src/write_data.cpp:309)
+Total wall time: 0:00:00

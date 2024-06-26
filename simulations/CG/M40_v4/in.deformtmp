@@ -1,0 +1,48 @@
+# Kremer-Grest polymer model in LAMMPS
+
+units lj
+atom_style full
+dimension 3
+boundary p p p
+
+pair_style lj/cut 2.5
+#bond_style fene
+bond_style harmonic
+#angle_style harmonic
+
+read_data cool.dat
+pair_coeff * * 1.0 1.0 2.5
+bond_coeff * 100.0 1.2
+#bond_coeff 1 30.0 1.5 1.0 1.0
+#angle_coeff 1 16 180 
+
+#special_bonds fene
+special_bonds lj 0 1 1
+
+timestep 0.002
+
+# Neighbor list
+neighbor 1.0 bin
+neigh_modify delay 0 every 1 check yes
+
+thermo_style    custom step temp density pe enthalpy press pxx pyy pzz pxy pxz pyz lx ly lz xy yz xz density 
+thermo          1000
+
+dump            1 all custom 1000 dump_relax.data id mol type x y z
+dump_modify     1 sort id 
+
+# Initializiation
+velocity all create 0.1 19942
+
+#NVT melt run 
+#fix             1 all nvt temp 1.5 1.5 0.5
+fix             1 all deform 1 x trate 0.005 remap x
+#fix             2 all npt temp 0.1 0.1 0.5 y 1 1 5 z 1 1 5
+fix 2 all nvt temp 0.1 0.1 0.5
+fix             3 all bond/break 1 1 1.5
+fix             4 all bond/break 1 2 1.5
+run             200000
+unfix           1
+
+#write_restart   sout.rest
+write_data      deform.dat

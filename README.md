@@ -26,3 +26,11 @@ As detailed in the paper, our shortest path involves three steps:
 ### 2.3 Simple network models
 
 ## 3. Simulations
+
+This folder contains sample simulation inputs and outputs that are used for shortest path analyses. 
+
+- The all-atom model setup is provided in [Machine Learning Bond Breaking](https://github.com/TheJacksonLab/QM_ML_BondBreaking).
+
+- We performed CG simulations with three types of bonded interactions: harmonic, FENE, and quartic bonds. Both the CG network and AA network are crosslinked dynamically through MD simulations.
+
+- The network model is a static network model, where the edges are formed between randomly distributed nodes based on a Gaussian probability distribution.
