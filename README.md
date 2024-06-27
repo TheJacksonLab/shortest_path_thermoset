@@ -31,6 +31,8 @@ We performed CG simulations with three types of bonded interactions: harmonic, F
 
 The all-atom model setup is provided in [Machine Learning Bond Breaking](https://github.com/TheJacksonLab/QM_ML_BondBreaking).
 
+`simulations/AA/SP_dist.py` shows how to convert the AA configurations to crosslinker-based network (for efficiency) and computes the shortest path distributions for various degrees of crosslinking.
+
 ### 2.3 Simple network models
 
 The network model is a static network model, where the edges are formed between randomly distributed nodes based on a Gaussian probability distribution.

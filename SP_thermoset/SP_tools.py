@@ -8,8 +8,6 @@ import tools_lammps as tool_lmp
 import copy
 from scipy.signal import savgol_filter
 import re
-import scienceplots
-plt.style.use(['science','ieee'])
 
 def create_periodic_image(G, image_count, box_size, coors):
     G_new = nx.Graph()
