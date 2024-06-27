@@ -76,39 +76,39 @@ Neighbor list info ...
       pair build: half/bin/newton
       stencil: half/bin/3d
       bin: standard
-Per MPI rank memory allocation (min/avg/max) = 6.057 | 6.057 | 6.057 Mbytes
+Per MPI rank memory allocation (min/avg/max) = 6.06 | 6.06 | 6.06 Mbytes
    Step          Temp         Density         PotEng        Enthalpy        Press           Pxx            Pyy            Pzz            Pxy            Pxz            Pyz             Lx             Ly             Lz             Xy             Yz             Xz          Density    
-         0   2.5            0.001496       66832.354      158028.13      136.42331      101.55256      151.71895      155.99841     -11.567104     -33.195596      19.409347      50             50             50             0              0              0              0.001496     
-     10000   0.95500561     0.001496       0.94616799     14.460357      0.018085654    0.018424549    0.018712995    0.017119418   -0.00064278948 -0.00022977389 -0.00025212625  50             50             50             0              0              0              0.001496     
-     20000   0.51588349     0.001496       0.38609987     9.3817277      0.012306007    0.013150514    0.011942477    0.01182503    -8.8044995e-05  0.00052573851  7.8567682e-05  50             50             50             0              0              0              0.001496     
-Loop time of 1.36275 on 1 procs for 20000 steps with 187 atoms
+         0   2.5            0.001496       61260.799      145401.34      125.86867      66.077068      129.50618      182.02276      15.211065     -12.166673      11.608528      50             50             50             0              0              0              0.001496     
+     10000   0.87195854     0.001496       1.0451629      14.980499      0.018901052    0.019197657    0.018343517    0.019161982   -0.00011841135 -0.0017830467   0.00014189864  50             50             50             0              0              0              0.001496     
+     20000   0.42480991     0.001496       0.42330446     9.4165606      0.012505735    0.012650078    0.012389013    0.012478115    0.00028552427 -0.00053541252 -0.00021885172  50             50             50             0              0              0              0.001496     
+Loop time of 1.35873 on 1 procs for 20000 steps with 187 atoms
 
-Performance: 1268025.418 tau/day, 14676.220 timesteps/s, 2.744 Matom-step/s
-99.4% CPU use with 1 MPI tasks x no OpenMP threads
+Performance: 1271777.995 tau/day, 14719.653 timesteps/s, 2.753 Matom-step/s
+99.7% CPU use with 1 MPI tasks x no OpenMP threads
 
 MPI task timing breakdown:
 Section |  min time  |  avg time  |  max time  |%varavg| %total
 ---------------------------------------------------------------
-Pair    | 1.2578     | 1.2578     | 1.2578     |   0.0 | 92.30
-Bond    | 0.00049534 | 0.00049534 | 0.00049534 |   0.0 |  0.04
-Neigh   | 0.011736   | 0.011736   | 0.011736   |   0.0 |  0.86
-Comm    | 0.046622   | 0.046622   | 0.046622   |   0.0 |  3.42
-Output  | 3.35e-05   | 3.35e-05   | 3.35e-05   |   0.0 |  0.00
-Modify  | 0.033369   | 0.033369   | 0.033369   |   0.0 |  2.45
-Other   |            | 0.01265    |            |       |  0.93
+Pair    | 1.2533     | 1.2533     | 1.2533     |   0.0 | 92.24
+Bond    | 0.00049748 | 0.00049748 | 0.00049748 |   0.0 |  0.04
+Neigh   | 0.012064   | 0.012064   | 0.012064   |   0.0 |  0.89
+Comm    | 0.047036   | 0.047036   | 0.047036   |   0.0 |  3.46
+Output  | 3.7251e-05 | 3.7251e-05 | 3.7251e-05 |   0.0 |  0.00
+Modify  | 0.03316    | 0.03316    | 0.03316    |   0.0 |  2.44
+Other   |            | 0.01266    |            |       |  0.93
 
 Nlocal:            187 ave         187 max         187 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Nghost:           1109 ave        1109 max        1109 min
+Nghost:           1129 ave        1129 max        1129 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
-Neighs:           6813 ave        6813 max        6813 min
+Neighs:           6811 ave        6811 max        6811 min
 Histogram: 1 0 0 0 0 0 0 0 0 0
 
-Total # of neighbors = 6813
-Ave neighs/atom = 36.433155
+Total # of neighbors = 6811
+Ave neighs/atom = 36.42246
 Ave special neighs/atom = 0
-Neighbor list builds = 67
-Dangerous builds = 7
+Neighbor list builds = 68
+Dangerous builds = 8
 unfix           1
 
 #write_restart   sout.rest

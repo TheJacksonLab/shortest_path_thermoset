@@ -1,4 +1,3 @@
-import networkx as nx
 import numpy as np
 import pandas as pd
 import tools_lammps as tool_lmp
@@ -89,7 +88,7 @@ def create_NN_lammps(lammps_file,new_file,select_idx=[],natom_DGEBA=49,natom_MDA
     output: print new lammps file 
     
     """
-    lmp_tmp = els.read_lammps_full(lammps_file)
+    lmp_tmp = tool_lmp.read_lammps_full(lammps_file)
     bond_info = lmp_tmp.bond_info
 
     natoms,box,index,atom_type,coors = read_lammps(lammps_file,lmp_mode='full')
