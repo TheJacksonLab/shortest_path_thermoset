@@ -35,7 +35,7 @@ def length_evo(path,result,t,L):
         length_contour_list.append(length_contour/wavelength)
     return length_contour_list, length_e2e
 
-dir_path = '../simulations/M40'
+dir_path = '../../simulations/M40_v2'
 SPL,path = sp.get_SP_new('{}/cool.dat'.format(dir_path),2,6,slice_x_max=2)
 
 file_trj = '{}/dump_relax.data'.format(dir_path)
