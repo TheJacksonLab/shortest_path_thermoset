@@ -1,9 +1,6 @@
 import networkx as nx
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import my_common as mc
-import extract_local_str as els
 import tools_lammps as tool_lmp
 import copy
 from scipy.signal import savgol_filter
@@ -31,6 +28,61 @@ def read_MLABT_BBIr(file):
     matches = re.findall(pattern, content)
     return np.array(matches).astype(float)
 
+def read_lammps(file, lmp_mode='charge'):
+    """
+    shift the original point to 0 0 0
+    """
+
+    f=open(file,'r')
+    L=f.readlines()
+    f.close()
+
+    isxyxzyz = 0
+    for iline in range(len(L)):
+        if 'atoms' in L[iline]:
+            natoms = int(L[iline].split()[0])
+        if 'xlo' in L[iline]:
+            xlo=float(L[iline].split()[0])
+            xhi=float(L[iline].split()[1])
+        if 'ylo' in L[iline]:
+            ylo=float(L[iline].split()[0])
+            yhi=float(L[iline].split()[1])
+        if 'zlo' in L[iline]:
+            zlo=float(L[iline].split()[0])
+            zhi=float(L[iline].split()[1])
+
+        if 'xy' in L[iline]:
+            isxyxzyz=1
+            xy=float(L[iline].split()[0])
+            xz=float(L[iline].split()[1])
+            yz=float(L[iline].split()[2])
+
+        if 'Atoms #' in L[iline]:
+            latom = iline+2
+
+    if isxyxzyz==0:
+        xy=0; xz=0; yz=0
+
+    box = np.array([[xhi-xlo,0,0],[xy,yhi-ylo,0],[xz,yz,zhi-zlo]])
+
+    index = np.empty(natoms)
+    atom_type = np.empty(natoms)
+    coors = np.empty([natoms,3])
+
+    for i in range(natoms):
+        index[i] = int(L[latom+i].split()[0])
+        if lmp_mode =='charge':
+            atom_type[i] = int(L[latom+i].split()[1])
+            coors[i,:] = np.array([float(L[latom+i].split()[3])-xlo,float(L[latom+i].split()[4])-ylo,float(L[latom+i].split()[5])-zlo])
+        elif lmp_mode =='full':
+            atom_type[i] = int(L[latom+i].split()[2])
+            coors[i,:] = np.array([float(L[latom+i].split()[4])-xlo,float(L[latom+i].split()[5])-ylo,float(L[latom+i].split()[6])-zlo])
+
+    if atom_type[-1]>0:
+        return natoms,box,index,atom_type,coors
+    else:
+        print("error")
+
 def create_NN_lammps(lammps_file,new_file,select_idx=[],natom_DGEBA=49,natom_MDA=29):
     """
     inputs: lammps_file,new_file,select_idx (optional for making the selected N atoms another type in visualization)
@@ -40,7 +92,7 @@ def create_NN_lammps(lammps_file,new_file,select_idx=[],natom_DGEBA=49,natom_MDA
     lmp_tmp = els.read_lammps_full(lammps_file)
     bond_info = lmp_tmp.bond_info
 
-    natoms,box,index,atom_type,coors = mc.read_lammps(lammps_file,lmp_mode='full')
+    natoms,box,index,atom_type,coors = read_lammps(lammps_file,lmp_mode='full')
     coors = coors[np.argsort(index)]
     atom_type = atom_type[np.argsort(index)]
     index = index[np.argsort(index)]
@@ -184,9 +236,8 @@ def output_data_afterBB(location, threshold_BB = 1.5):
     file_trj = '{}/dump_relax.data'.format(location)
 
     # SPL,path = get_SP(file_bonds,2,8)
-    lmp = els.read_lammps_full(file_bonds)
+    lmp = tool_lmp.read_lammps_full(file_bonds)
     lmp_tmp = copy.copy(lmp)
-    # result, t = els.read_multiple_xyz(file_trj)
     result, t, L = tool_lmp.read_lammps_dump_custom(file_trj)
 
     bond_length = []
@@ -200,7 +251,7 @@ def output_data_afterBB(location, threshold_BB = 1.5):
         coors = result[i].loc[:,'x':'z'].to_numpy()
         
         # for ibond in range(len(idx_bonded_atoms)):
-        dist = mc.pbc_distance(coors[idx_bonded_atoms[:,0]],
+        dist = tool_lmp.pbc_distance(coors[idx_bonded_atoms[:,0]],
                         coors[idx_bonded_atoms[:,1]],
                         box)
         bond_length.append(dist)
@@ -226,78 +277,48 @@ def output_data_afterBB(location, threshold_BB = 1.5):
     
     return idx_bead_NN_list,strain_list
 
-def first_BB_segment(file_trj,SPL,path,file_bonds,threshold):
+# def first_BB_segment(file_trj,SPL,path,file_bonds,threshold):
 
-    # 1st bond breakage 
-    lmp = els.read_lammps_full(file_bonds)
-    idx_bonded_atoms = (lmp.bond_info[:,2:]-1).astype(int)
+#     # 1st bond breakage 
+#     lmp = tool_lmp.read_lammps_full(file_bonds)
+#     idx_bonded_atoms = (lmp.bond_info[:,2:]-1).astype(int)
 
-    # distances of bonds in the trajectory 
-    result, t = els.read_multiple_xyz(file_trj)
+#     # distances of bonds in the trajectory 
+#     result, t = els.read_multiple_xyz(file_trj)
 
-    bond_length = []
-    strain = []
-    for i in range(len(t)):
-        box = result[i][0]
-        coors = result[i][4]
-        strain.append(np.log(box[0,0]/result[0][0][0,0]))
-        # for ibond in range(len(idx_bonded_atoms)):
-        dist = mc.pbc_distance(coors[idx_bonded_atoms[:,0]],
-                        coors[idx_bonded_atoms[:,1]],
-                        box)
-        bond_length.append(dist)
-        if np.sum(dist>threshold)>0:
-            break
+#     bond_length = []
+#     strain = []
+#     for i in range(len(t)):
+#         box = result[i][0]
+#         coors = result[i][4]
+#         strain.append(np.log(box[0,0]/result[0][0][0,0]))
+#         # for ibond in range(len(idx_bonded_atoms)):
+#         dist = tool_lmp.pbc_distance(coors[idx_bonded_atoms[:,0]],
+#                         coors[idx_bonded_atoms[:,1]],
+#                         box)
+#         bond_length.append(dist)
+#         if np.sum(dist>threshold)>0:
+#             break
 
-    # print(t[i])
-    idx_bead_NN = (idx_bonded_atoms[np.argwhere(dist>1.5).squeeze()]).reshape(-1,2)
-    # print(idx_bead_NN)
+#     # print(t[i])
+#     idx_bead_NN = (idx_bonded_atoms[np.argwhere(dist>1.5).squeeze()]).reshape(-1,2)
+#     # print(idx_bead_NN)
 
-    idx_onpath_list = []
-    for i in range(idx_bead_NN.shape[0]):
-        for j in range(len(path)):
-            if idx_bead_NN[i] in path[np.argsort(SPL)[j]]:
-                path_length = np.sort(SPL)[j]
-                idx_path = np.argwhere(np.sort(SPL)==path_length)[0]
-                print(idx_path)
-                print('0th broken bond in {}th SP (length), {}th SP'.format(idx_path, j),path_length-1)
-                if j==idx_path:
-                    # try:
-                    which_edge = np.min([np.argwhere(path[np.argsort(SPL)[j]][:-1,0]==idx_bead_NN[i][0]).squeeze(),
-                                        np.argwhere(path[np.argsort(SPL)[j]][:-1,0]==idx_bead_NN[i][1]).squeeze()])
-                    # except:
-                    print(len(path[np.argsort(SPL)[j]][:-1,0])-1,which_edge,idx_bead_NN[i])
-                    idx_onpath_list.append([j,which_edge])
-                break
-    idx_onpath_list = np.concatenate([idx_onpath_list])
-    return idx_onpath_list
-
-def compute_RD(lammps_file,direction):
-    # lammps_file = './length/M40_v0/cool.dat'
-    lmp_new = tool_lmp.read_lammps_full(lammps_file)
-    slice_x_max = lmp_new.x[1]-lmp_new.x[0]
-    lmp_new.atom_info = lmp_new.atom_info[np.argsort(lmp_new.atom_info[:,0])]
-    coors = lmp_new.atom_info[:,4:7]-np.array([lmp_new.x[0],lmp_new.y[0],lmp_new.z[0]])
-    G1 = nx.Graph()
-    G1.add_nodes_from(np.arange(0,lmp_new.natoms))
-    for ib in range(len(lmp_new.bond_info)):
-        G1.add_edges_from([lmp_new.bond_info[ib,2:].astype(int)-1])
-
-    image_number = 2
-    if direction=='x':
-        box_size = float(np.diff(lmp_new.x))
-        Gn = create_periodic_image(G1, image_number, box_size,coors)
-
-    largest_cc = max(nx.connected_components(Gn),key=len)
-    Gn_connected = Gn.subgraph(largest_cc).copy()
-
-    N = len(Gn_connected.nodes())
-    rd_vector = np.zeros(lmp_new.natoms)  # Initialize matrix
-    for i, nodeA in enumerate(Gn_connected.nodes()):
-        atom_A,image_A = nodeA
-        for j, nodeB in enumerate(Gn_connected.nodes()):
-            atom_B,image_B = nodeB
-            if atom_A == atom_B and image_A == 0 and image_B == image_number-1:  # Compute RD once for each pair due to symmetry
-                rd = nx.resistance_distance(Gn_connected, nodeA, nodeB)
-                rd_vector[atom_A] = rd
-    return rd_vector
+#     idx_onpath_list = []
+#     for i in range(idx_bead_NN.shape[0]):
+#         for j in range(len(path)):
+#             if idx_bead_NN[i] in path[np.argsort(SPL)[j]]:
+#                 path_length = np.sort(SPL)[j]
+#                 idx_path = np.argwhere(np.sort(SPL)==path_length)[0]
+#                 print(idx_path)
+#                 print('0th broken bond in {}th SP (length), {}th SP'.format(idx_path, j),path_length-1)
+#                 if j==idx_path:
+#                     # try:
+#                     which_edge = np.min([np.argwhere(path[np.argsort(SPL)[j]][:-1,0]==idx_bead_NN[i][0]).squeeze(),
+#                                         np.argwhere(path[np.argsort(SPL)[j]][:-1,0]==idx_bead_NN[i][1]).squeeze()])
+#                     # except:
+#                     print(len(path[np.argsort(SPL)[j]][:-1,0])-1,which_edge,idx_bead_NN[i])
+#                     idx_onpath_list.append([j,which_edge])
+#                 break
+#     idx_onpath_list = np.concatenate([idx_onpath_list])
+#     return idx_onpath_list

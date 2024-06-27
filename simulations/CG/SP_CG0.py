@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import tools_lammps as tool_lmp
 import sys 
 sys.path.append('../../')
+import tools_lammps as tool_lmp
 import SP_thermoset.SP_tools as sp
 from tqdm import tqdm
 
-def collect_data0(dir_list,image_number1=2,image_numbe2=8):
+def collect_data(dir_list,image_number1=2,image_numbe2=8):
     SPL_M400 = []
     hs_M400 = []
     size_M400 = []
@@ -29,8 +29,10 @@ def collect_data0(dir_list,image_number1=2,image_numbe2=8):
     min_M400 = np.array([np.min(SPL_M400[i]) for i in range(len(SPL_M400))])
     return SPL_M400, hs_M400, min_M400, size_M400
 
-dir_list = ['../../simulations/CG/M40_ck75_v{}'.format(i) for i in range(10)]
-SPL_M40_ck75, hs_M40_ck75, min_M40_ck75, size_M40_ck75 = collect_data0(dir_list)
+dir_list = ['./M40_ck75_v{}'.format(i) for i in range(10)]
+SPL_M40_ck75, hs_M40_ck75, min_M40_ck75, size_M40_ck75 = collect_data(dir_list)
+
+sp.count_BB_CG(file_bonds='{}/cool.dat'.format(dir_list[0]),file_trj='{}/dump_relax.data'.format(dir_list[0]),threshold=1.5)
 
 def plot_min_SPL(ax,min_M20,size_M20,hs_M20,label1,**kwargs):
     ax.plot(min_M20/size_M20,np.exp(hs_M20)-1,'o',label='{0:s}'.format(label1),**kwargs)

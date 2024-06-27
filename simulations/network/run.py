@@ -1,12 +1,10 @@
 import numpy as np
-import my_common as mc
 from generate_network import create_ini_lammps,lmp_add_edge
-import matplotlib.pyplot as plt
 import os
-import extract_local_str as els
-import shortest_path as sp
+import sys
+sys.path.append('../../')
+from SP_thermoset import SP_tools as sp
 from tqdm import tqdm
-import pickle 
 
 run_lammps = 'lmp_serial'
 def SP_create(lmp_file,size,ck_degree,density,max_degree,sigma,if_generate=True):

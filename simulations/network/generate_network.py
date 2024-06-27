@@ -1,7 +1,8 @@
 import networkx as nx
 import numpy as np
-import my_common as mc
-import extract_local_str as els
+import sys
+sys.path.append('../../')
+from SP_thermoset import tools_lammps as tool_lmp
 import itertools
 
 def create_ini_lammps(file_loc,box_size,density=0.05):
@@ -34,7 +35,7 @@ def create_ini_lammps(file_loc,box_size,density=0.05):
           np.zeros([natoms,3]),
           ])
     
-    lmp = els.lammps(
+    lmp = tool_lmp.lammps(
         natoms=natoms,
         # nbonds=num_edges,
         natom_types = 1,
@@ -48,7 +49,7 @@ def create_ini_lammps(file_loc,box_size,density=0.05):
         atom_info= atom_info,
         # bond_info=bond_info
         )
-    els.write_lammps_full(file_loc,lmp)
+    tool_lmp.write_lammps_full(file_loc,lmp)
     
 def gaussian_probability(distance, sigma=2):
     return np.exp(-0.5 * (distance / sigma) ** 2)
@@ -62,7 +63,7 @@ def lmp_add_edge(lmp_file,lmp_file_new,ck_degree=0.9,max_degree=3,sigma=10):
     # lmp_file = 'relax.dat'
     # max_degree = 3
 
-    lmp = els.read_lammps_full(lmp_file)
+    lmp = tool_lmp.read_lammps_full(lmp_file)
     atom_info = lmp.atom_info[np.argsort(lmp.atom_info[:,0]),:]
     coors = atom_info[:,4:7]
     box = np.array([[lmp.x[1]-lmp.x[0],0,0],
@@ -74,7 +75,7 @@ def lmp_add_edge(lmp_file,lmp_file_new,ck_degree=0.9,max_degree=3,sigma=10):
     node_pairs = list(itertools.combinations(range(len(coors)), 2))
     distances = []
     for i,j in node_pairs:
-        distances.append(mc.pbc_distance(coors[i],coors[j],box))
+        distances.append(tool_lmp.distance_pbc(coors[i],coors[j],box))
     distances = np.array(distances)
     probabilities = gaussian_probability(distances,sigma=sigma).squeeze()
     probabilities /= probabilities.sum()  # Normalize probabilities
@@ -96,7 +97,7 @@ def lmp_add_edge(lmp_file,lmp_file_new,ck_degree=0.9,max_degree=3,sigma=10):
             A[j,i] +=1
             edges_added+=1
     bond_info = np.array(bond_info)
-    lmp_new = els.lammps(
+    lmp_new = tool_lmp.lammps(
             natoms=lmp.natoms,
             nbonds=num_edges,
             natom_types = 1,
@@ -110,7 +111,7 @@ def lmp_add_edge(lmp_file,lmp_file_new,ck_degree=0.9,max_degree=3,sigma=10):
             atom_info= atom_info,
             bond_info=bond_info
             )
-    els.write_lammps_full(lmp_file_new,lmp_new)
+    tool_lmp.write_lammps_full(lmp_file_new,lmp_new)
     return lmp_new
 
 def network_to_lammps(G,coors,box_size,file_loc='./network.data'):
@@ -130,7 +131,7 @@ def network_to_lammps(G,coors,box_size,file_loc='./network.data'):
         np.ones([num_edges,1]),
         np.array([[i+1,j+1] for i,j in bond_idx])
         ])
-    lmp = els.lammps(
+    lmp = tool_lmp.lammps(
         natoms=natoms,
         nbonds=num_edges,
         natom_types = 1,
@@ -144,4 +145,4 @@ def network_to_lammps(G,coors,box_size,file_loc='./network.data'):
         atom_info= atom_info,
         bond_info=bond_info
         )
-    els.write_lammps_full(file_loc,lmp)
+    tool_lmp.write_lammps_full(file_loc,lmp)

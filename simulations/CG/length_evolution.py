@@ -1,12 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import my_common as mc
-import extract_local_str as els
-import networkx as nx
-import scienceplots
-plt.style.use(['science','ieee'])
+import sys
+sys.path.append('../../')
 import tools_lammps as tool_lmp
-import shortest_path as sp
+import SP_thermoset.SP_tools as sp
 
 def length_evo(path,result,t,L):
     path_0 = path[:,0]
@@ -24,7 +21,7 @@ def length_evo(path,result,t,L):
                 [0,L[itime][1][1]-L[itime][1][0],0],
                 [0,0,L[itime][2][1]-L[itime][2][0]],
             ])
-            length = mc.pbc_distance(coors[path_0[i]],coors[path_0[i+1]],box)
+            length = tool_lmp.distance_pbc(coors[path_0[i]],coors[path_0[i+1]],box)
             if length>1.5:
                 flag = True
                 break
@@ -35,8 +32,8 @@ def length_evo(path,result,t,L):
         length_contour_list.append(length_contour/wavelength)
     return length_contour_list, length_e2e
 
-dir_path = '../../simulations/M40_v2'
-SPL,path = sp.get_SP_new('{}/cool.dat'.format(dir_path),2,6,slice_x_max=2)
+dir_path = './M40_v2'
+SPL,path = sp.get_SP('{}/cool.dat'.format(dir_path),2,6,slice_x_max=2)
 
 file_trj = '{}/dump_relax.data'.format(dir_path)
 result, t, L = tool_lmp.read_lammps_dump_custom(file_trj)
