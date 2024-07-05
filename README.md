@@ -3,9 +3,9 @@ Repository for shortest path analysis in thermosets
 
 ## 1. Introduction
 
-Understanding the microscopic mechanicsm of initial bond scissions in polymer networks under deformation remains a challenge due to the interwine of complex network topology and amorphous polymeric structure. This project introduces a theoretical approach based on the shortest path of the network topology to predict where and when the first bond breaks in thermosets.  
+Understanding the microscopic mechanicsm of initial bond scissions in polymer networks under deformation remains a challenge due to the interplay between the complex network topology and the amorphous polymeric structure. This project introduces a theoretical approach based on the shortest path of the network topology to predict the location and strain of the initial bond scissions in thermosets.
 
-This repo provides tools for computing the shortest path in bulk thermoset network with periodic boundaries, and sample simulation data for testing. More information can be found in our preprint paper, "Shortest paths govern fracture nucleation in thermoset networks" available [here](https://arxiv.org/abs/2405.03551).
+This repo provides tools for computing the shortest path in bulk thermoset networks with periodic boundaries, and sample simulation data for testing. More information can be found in our preprint paper, "Shortest paths govern fracture nucleation in thermoset networks" available [here](https://arxiv.org/abs/2405.03551).
 
 ## 2. Network Analyses and Simulations
 
